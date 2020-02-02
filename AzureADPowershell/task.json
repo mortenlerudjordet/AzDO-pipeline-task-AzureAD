@@ -1,0 +1,150 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Microsoft/azure-pipelines-task-lib/master/tasks.schema.json",
+	"id": "f086de38-2554-4cd1-a687-c7b689544551",
+    "name": "AzureADPowerShell",
+    "friendlyName": "Azure AD PowerShell",
+    "description": "Run PowerShell script/inline using the Azure AD Preview module and MSAL authentication",
+    "helpMarkDown": "The SC/SP running the task will need to be given access to the AAD graph api based on what the code wants to do. This access is given on the App registration in AAD.",
+    "category": "Deploy",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "runsOn": [
+        "Agent",
+        "DeploymentGroup"
+    ],
+    "author": "Microsoft & Morten Lerudjordet",
+    "version": {
+        "Major": 1,
+        "Minor": 0,
+        "Patch": 0
+    },
+    "preview": "true",
+    "releaseNotes": "This task is based on the V5 of Azure Powershell task by Microsoft. Instead of Az/AzureRM this task sets up usage of AzureADPreview module",
+    "groups": [
+        {
+            "name": "AzureADPowerShellVersionOptions",
+            "displayName": "Azure AD PowerShell version options",
+            "isExpanded": true
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "minimumAgentVersion": "2.115.0",
+    "inputs": [
+        {
+            "name": "ConnectedServiceNameARM",
+            "aliases": [
+                "azureSubscription"
+            ],
+            "type": "connectedService:AzureRM",
+            "label": "Azure Subscription",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Azure Resource Manager subscription to configure before running PowerShell",
+            "properties": {
+                "EndpointFilterRule": "ScopeLevel != AzureMLWorkspace"
+            }
+        },
+        {
+            "name": "ScriptType",
+            "type": "radio",
+            "label": "Script Type",
+            "required": false,
+            "helpMarkDown": "Type of the script: File Path or Inline Script",
+            "defaultValue": "FilePath",
+            "options": {
+                "FilePath": "Script File Path",
+                "InlineScript": "Inline Script"
+            }
+        },
+        {
+            "name": "ScriptPath",
+            "type": "filePath",
+            "label": "Script Path",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "Path of the script. Should be fully qualified path or relative to the default working directory.",
+            "visibleRule": "ScriptType = FilePath"
+        },
+        {
+            "name": "Inline",
+            "type": "multiLine",
+            "label": "Inline Script",
+            "required": false,
+            "defaultValue": "# You can write your Azure AD PowerShell scripts inline here. \n# You can also pass predefined and custom variables to this script using arguments\nDisconnect-AzureAD -ErrorAction SilentlyContinue -WarningAction SilentlyContinue",
+            "helpMarkDown": "Enter the script to execute.",
+            "visibleRule": "ScriptType = InlineScript",
+            "properties": {
+                "resizable": "true",
+                "rows": "10",
+                "maxLength": "5000"
+            }
+        },
+        {
+            "name": "ScriptArguments",
+            "type": "string",
+            "label": "Script Arguments",
+            "defaultValue": "",
+            "visibleRule": "ScriptType = FilePath",
+            "required": false,
+            "properties": {
+                "editorExtension": "ms.vss-services-azure.parameters-grid"
+            },
+            "helpMarkDown": "Additional parameters to pass to PowerShell.  Can be either ordinal or named parameters."
+        },
+        {
+            "name": "errorActionPreference",
+            "type": "pickList",
+            "label": "ErrorActionPreference",
+            "required": false,
+            "defaultValue": "stop",
+            "options": {
+                "stop": "Stop",
+                "continue": "Continue",
+                "silentlyContinue": "SilentlyContinue"
+            },
+            "helpMarkDown": "Select the value of the ErrorActionPreference variable for executing the script."
+        },
+        {
+            "name": "FailOnStandardError",
+            "type": "boolean",
+            "label": "Fail on Standard Error",
+            "required": false,
+            "defaultValue": "false",
+            "helpMarkDown": "If this is true, this task will fail if any errors are written to the error pipeline, or if any data is written to the Standard Error stream."
+        },
+        {
+            "name": "workingDirectory",
+            "type": "filePath",
+            "label": "Working Directory",
+            "required": false,
+            "defaultValue": "",
+            "helpMarkDown": "Working directory where the script is run.",
+            "groupName": "advanced"
+        }
+    ],
+    "instanceNameFormat": "Azure AD PowerShell script: $(ScriptType)",
+    "execution": {
+        "PowerShell3": {
+            "target": "azureadpowershell.ps1",
+            "platforms": [
+                "windows"
+            ]
+        }
+    },
+    "messages": {
+        "GeneratingScript": "Generating script.",
+        "JS_FormattedCommand": "Formatted command: %s",
+        "InvalidScriptArguments0": "Invalid script arguments '{0}'. Line breaks are not allowed.",
+        "InvalidScriptPath0": "Invalid script path '{0}'. Invalid path characters specified.",
+        "InvalidAzurePsVersion": "The Azure AD PowerShell version '{0}' specified is not in the correct format. Please check the format. An example of correct format is 1.0.1",
+        "JS_ExitCode": "PowerShell exited with code '%s'.",
+        "JS_Stderr": "PowerShell wrote one or more lines to the standard error stream.",
+        "ExpiredServicePrincipal": "Could not fetch access token for Azure. Verify if the Service Principal used is valid and not expired."
+    }
+}

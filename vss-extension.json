@@ -1,0 +1,40 @@
+{
+    "manifestVersion": 1,
+    "id": "AzureADPowerShellTask",
+    "name": "Azure AD Powershell",
+    "version": "0.0.15",
+    "publisher": "leruninfo",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "description": "Run PowerShell script/inline using the Azure AD Preview module and MSAL authentication using AzD SC/AAD SP",
+    "categories": [
+        "Azure Pipelines"
+    ],
+    "repository": {
+        "type": "git",
+        "uri": "https://github.com/mortenlerudjordet/AzDO-pipeline-task-AzureAD"
+    },
+    "icons": {
+        "default": "images/AzureADPS.png"
+    },
+    "files": [
+        {
+            "path": "AzureADPowershell", "addressable": true
+        }
+    ],
+    "contributions": [
+        {
+            "id": "AzureADPowerShell",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "AzureADPowerShell"
+            }
+        }
+    ]
+}
