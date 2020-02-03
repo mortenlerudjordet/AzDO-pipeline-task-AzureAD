@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "AzureADPowerShellTask",
     "name": "Azure AD Powershell",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "publisher": "leruninfo",
     "targets": [
         {
