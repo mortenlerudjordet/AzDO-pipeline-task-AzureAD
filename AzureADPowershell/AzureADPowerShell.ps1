@@ -116,8 +116,8 @@ try
         if($Module.Update)
         {
             Write-Host -Object "Installing latest version: $($Module.NewVersion) of module: $($Module.ModuleName)"
-            Write-Host -Object "##[command]Install-Module -Name $($Module.ModuleName) -Scope CurrentUser -AllowClobber -Force -Repository $PSGalleryRepositoryName"
-            Install-Module -Name $($Module.ModuleName) -Scope CurrentUser -AllowClobber -Force -Repository $PSGalleryRepositoryName -ErrorAction Continue -ErrorVariable oErr
+            Write-Host -Object "##[command]Install-Module -Name $($Module.ModuleName) -Scope CurrentUser -AllowClobber -Force -Repository $PSGalleryRepositoryName -AcceptLicense"
+            Install-Module -Name $($Module.ModuleName) -Scope CurrentUser -AllowClobber -Force -Repository $PSGalleryRepositoryName -AcceptLicense -ErrorAction Continue -ErrorVariable oErr
             if ($oErr)
             {
                 if ($oErr -like "*No match was found for the specified search criteria and module name*")
