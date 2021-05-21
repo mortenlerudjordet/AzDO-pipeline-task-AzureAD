@@ -37,8 +37,7 @@ try
 
     #region Internal Variables
     $PSGalleryRepositoryName = "PSGallery"
-    $MSALModuleName = "MSAL.PS"
-    $AADModuleName = "AzureADPreview"
+    $ModuleNames = @("AzureADPreview", "MSAL.PS")
     $AuthContextScriptName = "InitializeContext.ps1"
     #endregion
 
@@ -81,13 +80,17 @@ try
     # TODO: Clean up old version of a module
 
     #region Module version check
-    $ModulesToCheck = @(
-        [pscustomobject]@{ModuleName = $MSALModuleName;Update = "";NewVersion= "";CurrentVersion = "NA"},
-        [pscustomobject]@{ModuleName = $AADModuleName;Update = "";NewVersion= "";CurrentVersion = "NA"}
-    )
+    [Collections.ArrayList]$ModulesToCheck = @()
+    foreach($ModuleName in $ModuleNames)
+    {
+        $ModuleToAdd = [pscustomobject]@{ModuleName = $ModuleName;Update = "";NewVersion= "";CurrentVersion = "NA"}
+        $null = $ModulesToCheck.Add($ModuleToAdd)
+        $ModuleToAdd = $null
+    }
     foreach($Module in $ModulesToCheck)
     {
-        if(-not (Get-Module -Name $($Module.ModuleName) -ListAvailable -ErrorAction Stop) )
+        $AvailableModuleVersions = Get-Module -Name $($Module.ModuleName) -ListAvailable -ErrorAction Stop
+        if(-not ($AvailableModuleVersions) )
         {
             # Force install of module as it does not exist on agent
             $Module.Update = $true
@@ -96,7 +99,7 @@ try
         else
         {
             $Module.Update = [version]($NewModuleVersion = Find-Module -Name $($Module.ModuleName) -ErrorAction Stop).Version -gt `
-                             [version]($CurrentModuleVersion = Get-Module -Name $($Module.ModuleName) -ListAvailable -ErrorAction Stop | Sort-Object -Property Version -Descending | Select-Object -First 1).Version
+                             [version]($CurrentModuleVersion = $AvailableModuleVersions | Sort-Object -Property Version -Descending | Select-Object -First 1).Version
             if($NewModuleVersion)
             {
                 $Module.NewVersion = $NewModuleVersion.Version.ToString()
